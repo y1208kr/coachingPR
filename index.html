@@ -3,635 +3,313 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>임원 코칭 연구 동향: 10년의 성과와 미래 과제</title>
+    <title>AI 기반 영업 교육 슬라이드쇼</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        html, body {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
+        body {
             font-family: 'Noto Sans KR', sans-serif;
-            background-color: #fdfdfc; /* Off-white base */
-            color: #595147; /* Base Text: Inspired by Warm Gray 9 */
-            word-break: keep-all;
-            /* UPDATED: Increased base font size by 10% */
-            font-size: 110%;
-        }
-
-        .main-container {
-            display: flex;
-            height: 100vh;
-            width: 100%;
-        }
-
-        .content-area {
-            flex-grow: 1;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .slider-container {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            background-color: #f0f2f5;
         }
         .slide {
-            width: 100%;
-            height: 100%;
-            flex-shrink: 0;
+            background-color: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            padding: 2rem;
             display: flex;
             flex-direction: column;
             justify-content: center;
-            align-items: center;
-            padding: 2rem 4rem;
+            min-height: 600px;
+        }
+        .chart-container {
             position: relative;
-            overflow: hidden;
-        }
-        
-        .slide.active .slide-content {
-            animation: fadeIn 0.7s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-        }
-        .slide-content {
-            opacity: 0;
             width: 100%;
-            max-width: 1200px;
-            max-height: calc(100vh - 4rem);
-            overflow-y: auto;
-            padding: 1rem;
-        }
-        /* Custom scrollbar for better aesthetics */
-        .slide-content::-webkit-scrollbar {
-            width: 8px;
-        }
-        .slide-content::-webkit-scrollbar-track {
-            background: #f1f1f1;
-        }
-        .slide-content::-webkit-scrollbar-thumb {
-            background: #A89F95;
-            border-radius: 4px;
-        }
-        .slide-content::-webkit-scrollbar-thumb:hover {
-            background: #7C7265;
-        }
-
-        .nav-button {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            background-color: rgba(0, 0, 0, 0.2);
-            color: white;
-            border-radius: 9999px;
-            width: 3.5rem;
-            height: 3.5rem;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            transition: all 0.3s;
-            z-index: 20;
-            border: 2px solid rgba(255,255,255,0.3);
-        }
-        .nav-button:hover {
-            background-color: rgba(0, 0, 0, 0.4);
-            transform: translateY(-50%) scale(1.1);
-        }
-        #prev-btn { left: 1.5rem; }
-        #next-btn { right: 1.5rem; }
-        
-        .section-title {
-            font-weight: 900;
-            color: #4A423A; /* Darker Warm Gray */
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.05);
-        }
-        .highlight {
-            color: #D15400; /* Pantone 159 C */
-            font-weight: 700;
-        }
-        .process-arrow {
-            color: #A89F95; /* Warm Gray 7 */
-            font-size: 2.5rem;
-            line-height: 1;
-        }
-        .critical-view {
-            background-color: #FFFBEB; /* Soft yellow, inspired by Pantone 124 C */
-            border-left: 5px solid #D94F00; /* Pantone 173 C */
-            padding: 1.5rem;
-            border-radius: 0.5rem;
-            box-shadow: 0 4px 15px rgba(217, 79, 0, 0.1);
-        }
-        .progress-indicator {
-            position: absolute;
-            bottom: 1.5rem;
-            right: 1.5rem;
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            z-index: 10;
-        }
-        .progress-bar-container {
-             width: 12rem;
-             height: 8px;
-             background-color: rgba(0, 0, 0, 0.1);
-             border-radius: 4px;
-             overflow: hidden;
-        }
-        .progress-bar {
             height: 100%;
-            background-color: #EC8A00; /* Pantone 144 C */
-            border-radius: 4px;
-            transition: width 0.5s ease-in-out;
+            min-height: 300px;
+            max-height: 450px;
+            margin-left: auto;
+            margin-right: auto;
         }
-        .slide-number {
-            font-size: 0.875rem;
-            color: #7C7265; /* Warm Gray 9 */
-            font-weight: 600;
-            min-width: 50px;
+        .gemini-button {
+            background-color: #118AB2;
+            color: white;
+            font-weight: bold;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            transition: background-color 0.3s;
         }
-        .explanation-box {
-            background-color: #FFFDF5;
-            border-left: 4px solid #EAAA00; /* Pantone 124 C */
-            padding: 1rem;
-            border-radius: 0.25rem;
-            font-size: 0.9rem;
-            margin-top: 0.75rem;
+        .gemini-button:hover {
+            background-color: #073B4C;
         }
-        .card {
-            background-color: white;
-            border-radius: 0.75rem;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.07);
-            transition: all 0.3s ease-in-out;
-            border: 1px solid rgba(0,0,0,0.05);
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border-left-color: #118AB2;
+            animation: spin 1s ease infinite;
         }
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
     </style>
 </head>
-<body>
-    <div class="main-container">
-        <main class="content-area">
-            <div id="slider-container" class="slider-container">
-                <!-- Slide 1: Title -->
-                <div class="slide active" data-title="시작">
-                    <div class="slide-content text-center">
-                        <h1 class="text-5xl md:text-6xl font-black text-slate-900 leading-tight">임원 코칭 연구에 대한 비판적 검토 </h1>
-                        <p class="mt-4 text-2xl md:text-3xl" style="color: #595147;">지난 10년의 성과와 미래 과제</p>
-                        <div class="mt-12 border-t border-gray-300 pt-8 max-w-lg mx-auto">
-                            <p class="text-lg font-bold" style="color: #4A423A;">비즈니스코칭세미나 (김유천 교수님)</p>
-                            <p class="mt-2 text-lg" style="color: #595147;">발표자: 염승빈 (인사조직 박사과정, 2025172099)</p>
-                            <p class="mt-4 text-base" style="color: #7C7265;">Passmore & Fillery-Travis (2011) 논문 발표 및 비평</p>
+<body class="bg-gray-100 text-[#073B4C]">
+
+    <header class="bg-[#073B4C] text-white text-center py-8 px-4">
+        <h1 class="text-4xl md:text-5xl font-black mb-2">AI 기반 영업 전문가 성장 프로그램</h1>
+        <p class="text-lg md:text-xl text-[#FFD166]">AI와 함께 실전 역량을 강화하는 3단계 핵심 모듈</p>
+    </header>
+
+    <main class="container mx-auto p-4 md:p-8 max-w-5xl">
+        <div id="slideshow-container" class="relative">
+            <button id="prev-btn" class="absolute top-1/2 -left-4 md:-left-16 transform -translate-y-1/2 bg-white/70 hover:bg-white focus:outline-none shadow-md rounded-full w-12 h-12 flex items-center justify-center text-2xl font-bold text-gray-700 z-10 transition-colors">❮</button>
+            <button id="next-btn" class="absolute top-1/2 -right-4 md:-right-16 transform -translate-y-1/2 bg-white/70 hover:bg-white focus:outline-none shadow-md rounded-full w-12 h-12 flex items-center justify-center text-2xl font-bold text-gray-700 z-10 transition-colors">❯</button>
+
+            <div class="slide">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-2xl font-bold text-[#118AB2]">M1: 고객 유형별 맞춤 접근법</h2>
+                    <span class="font-bold text-gray-400">Page 1 / 3</span>
+                </div>
+                 <div class="flex-grow flex flex-col justify-center">
+                    <h3 class="text-xl font-bold mb-4 text-center">AI를 활용한 고객 유형별 스크립트 생성</h3>
+                    <p class="text-sm text-gray-600 mb-6 text-center max-w-2xl mx-auto">대표 고객 유형의 특성을 이해하고 AI의 도움을 받아 맞춤형 접근 스크립트를 즉시 생성해 보세요.</p>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div id="type-data" class="flex flex-col items-center p-4 border border-gray-200 rounded-lg text-center">
+                            <span class="text-4xl mb-2">📊</span>
+                            <h4 class="font-bold">데이터 신봉형</h4>
+                            <p class="text-sm text-gray-600 mt-1 mb-4">숫자와 데이터 기반의 명확한 근거를 제시할 때 신뢰하며, 효율성과 ROI를 가장 중요하게 생각합니다.</p>
+                            <button class="gemini-button script-generator-btn mt-auto" data-type="데이터 신봉형" data-desc="숫자와 데이터 기반의 명확한 근거를 제시할 때 신뢰하며, 효율성과 ROI를 가장 중요하게 생각합니다.">✨ 맞춤 스크립트 생성</button>
+                        </div>
+                        <div id="type-relation" class="flex flex-col items-center p-4 border border-gray-200 rounded-lg text-center">
+                            <span class="text-4xl mb-2">🤝</span>
+                            <h4 class="font-bold">의리파 형님형</h4>
+                            <p class="text-sm text-gray-600 mt-1 mb-4">인간적인 관계와 신뢰를 우선시합니다. 꾸준한 관심과 진정성 있는 태도가 효과적입니다.</p>
+                            <button class="gemini-button script-generator-btn mt-auto" data-type="의리파 형님형" data-desc="인간적인 관계와 신뢰를 우선시합니다. 꾸준한 관심과 진정성 있는 태도가 효과적입니다.">✨ 맞춤 스크립트 생성</button>
+                        </div>
+                        <div id="type-careful" class="flex flex-col items-center p-4 border border-gray-200 rounded-lg text-center">
+                            <span class="text-4xl mb-2">🔍</span>
+                            <h4 class="font-bold">신중한 탐색가형</h4>
+                            <p class="text-sm text-gray-600 mt-1 mb-4">결정까지 다양한 정보를 비교하고 검토합니다. 충분한 정보와 선택지를 제공해야 합니다.</p>
+                            <button class="gemini-button script-generator-btn mt-auto" data-type="신중한 탐색가형" data-desc="결정까지 다양한 정보를 비교하고 검토합니다. 충분한 정보와 선택지를 제공해야 합니다.">✨ 맞춤 스크립트 생성</button>
                         </div>
                     </div>
                 </div>
-
-                <!-- Slide 2: Introduction -->
-                <div class="slide" data-title="서론">
-                    <div class="slide-content">
-                        <h2 class="section-title text-4xl mb-8">서론: 연구의 배경과 발표의 목적</h2>
-                        <div class="grid md:grid-cols-2 gap-8 text-lg">
-                            <div class="card p-8">
-                                <h3 class="text-2xl font-bold text-slate-800 mb-4">연구의 배경 및 중요성</h3>
-                                <ul class="list-disc list-outside pl-5 space-y-3">
-                                    <li>2000년대 초반, 코칭 시장은 폭발적으로 성장했으나 <span class="highlight">학문적 기반은 취약했음.</span></li>
-                                    <li>Kampa-Kokesch & Anderson(2001)의 리뷰는 이러한 연구의 부족을 지적하는 중요한 계기가 됨.</li>
-                                    <li>Passmore & Fillery-Travis(2011)의 본 논문은 그 후 10년간의 연구 성과를 비평적으로 종합하여, <span class="highlight">미래 연구의 초석</span>을 다지는 것을 목표로 함.</li>
-                                </ul>
-                            </div>
-                             <div class="card p-8">
-                                <h3 class="text-2xl font-bold text-slate-800 mb-4">발표의 목적과 구성</h3>
-                                 <ul class="list-disc list-outside pl-5 space-y-3">
-                                     <li>본 발표는 해당 논문의 주장을 비평적으로 분석하고, 코칭 연구의 <span class="highlight">과거와 현재를 짚어보며 미래를 조망</span>하는 것을 목적으로 함.</li>
-                                     <li>
-                                         <strong>발표 구성</strong>
-                                         <ol class="list-decimal list-outside pl-5 mt-2 text-base">
-                                             <li>코칭 연구의 역사적 발전 과정</li>
-                                             <li>지난 10년간의 핵심 연구 주제 심층 분석</li>
-                                             <li>미래 연구를 위한 명확한 청사진 제시</li>
-                                         </ol>
-                                     </li>
-                                 </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Slide 3: History (Timeline) -->
-                <div class="slide" data-title="역사">
-                    <div class="slide-content">
-                        <h2 class="section-title text-4xl mb-8">1. 코칭 연구의 역사적 발전 과정</h2>
-                        <h3 class="text-2xl font-bold text-slate-800 mb-6">1.1. 초기 연구의 태동 (1937-1999년)</h3>
-                        <div class="relative pl-10">
-                            <div class="absolute left-2 top-0 bottom-0 w-1 bg-slate-300"></div>
-                            <div class="relative mb-10">
-                                <div class="absolute left-[-2.3rem] top-1 h-6 w-6 rounded-full bg-[#EC8A00] border-4 border-white shadow-md"></div>
-                                <p class="font-bold text-lg" style="color:#D15400">1937년: 공식적 시작</p>
-                                <p class="mt-1">Gorby(1937)의 제조업 코칭 효과 연구</p>
-                            </div>
-                            <div class="relative mb-10">
-                                <div class="absolute left-[-2.3rem] top-1 h-6 w-6 rounded-full bg-[#EC8A00] border-4 border-white shadow-md"></div>
-                                <p class="font-bold text-lg" style="color:#D15400">1940-80년대: 연구 침체기</p>
-                                <p class="mt-1">소수의 연구만 발표되며 더디게 진행됨.</p>
-                            </div>
-                            <div class="relative">
-                                <div class="absolute left-[-2.3rem] top-1 h-6 w-6 rounded-full bg-[#EC8A00] border-4 border-white shadow-md"></div>
-                                <p class="font-bold text-lg" style="color:#D15400">1990년대: 연구 부흥기</p>
-                                <p class="mt-1">논문이 본격 등장, 리더십/경영 개발과 연계 논의</p>
-                                 <div class="mt-4 card p-6">
-                                     <p class="font-bold text-slate-800">주목할 만한 연구: Olivero et al. (1997)</p>
-                                      <ul class="mt-2 list-disc list-outside pl-5 space-y-1">
-                                          <li><strong>연구 설계:</strong> 31명의 관리자를 대상으로 전통적인 관리자 훈련 프로그램을 진행한 후, 8주간의 일대일 코칭을 추가로 제공.</li>
-                                          <li><strong>결과:</strong> 훈련 단독(<span class="highlight">22.4%</span>) 대비 훈련+코칭(<span class="highlight">88%</span>)의 월등한 생산성 향상</li>
-                                          <li><strong>의의:</strong> 코칭의 <span class="highlight">'부가적 가치(Additive Value)'</span>를 최초로 실증, 강력한 비즈니스 사례 제공</li>
-                                      </ul>
-                                 </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Slide 4: Maturity Model -->
-                <div class="slide" data-title="역사">
-                       <div class="slide-content">
-                             <h2 class="section-title text-4xl mb-8">1. 코칭 연구의 역사적 발전 과정</h2>
-                             <h3 class="text-2xl font-bold text-slate-800 mb-6">1.2. 학문 분야의 성숙도 모델</h3>
-                            <div class="card p-8">
-                                <div class="flex flex-col md:flex-row items-center justify-between gap-4 text-center">
-                                    <div class="flex-1 p-4 border-2 border-dashed border-slate-200 rounded-lg">
-                                        <p class="font-bold text-xl">Phase 1: 탐색</p>
-                                        <p class="mt-2 text-sm">현상 탐색, 경험 공유,<br>정의 및 경계 설정</p>
-                                    </div>
-                                    <div class="process-arrow transform md:rotate-0 rotate-90">→</div>
-                                    <div class="flex-1 p-4 bg-amber-100 border-2 border-amber-500 rounded-lg">
-                                        <p class="font-bold text-xl text-amber-800">Phase 2: 이론 구축</p>
-                                        <p class="mt-2 text-sm text-amber-700">사례연구 → RCT, 메타분석,<br>이론 구축 및 검증</p>
-                                    </div>
-                                    <div class="process-arrow transform md:rotate-0 rotate-90">→</div>
-                                    <div class="flex-1 p-4 border-2 border-dashed border-slate-200 rounded-lg">
-                                        <p class="font-bold text-xl">Phase 3: 예외 탐구</p>
-                                        <p class="mt-2 text-sm">확립된 이론의 예외, <br>특정 집단/상황별 효과 차이</p>
-                                    </div>
-                                </div>
-                                <div class="mt-8 text-center">
-                                    <p class="text-2xl font-bold">당시 코칭 연구의 진단: <span class="highlight">'2단계 후반'</span>에 위치함</p>
-                                    <p class="mt-2" style="color: #7C7265;">이론적 기반이 확립되는 과정이며, 일부 결과는 아직 충분히 검증되지 않았음을 시사.</p>
-                                </div>
-                            </div>
-                       </div>
-                </div>
-                
-                <!-- Slide 5: Core Topics Intro -->
-                <div class="slide" data-title="핵심 주제">
-                    <div class="slide-content text-center">
-                        <h2 class="section-title text-5xl mb-8">2. 지난 10년간의 핵심 연구 주제</h2>
-                        <p class="text-2xl" style="color: #595147;">코칭 연구가 탐색을 넘어 엄격한 이론 구축으로 나아가는 과정</p>
-                        <div class="mt-10 grid grid-cols-2 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
-                            <div class="card p-4 font-bold text-center">코칭의 본질과 정의</div>
-                            <div class="card p-4 font-bold text-center">코치의 행동과 역량</div>
-                            <div class="card p-4 font-bold text-center">대상자의 요인</div>
-                            <div class="card p-4 font-bold text-center col-span-2 md:col-span-1">코치-클라이언트 관계</div>
-                            <div class="card p-4 font-bold text-center">조직적 영향과 ROI</div>
-                        </div>
-                    </div>
-                </div>
-
-
-                <!-- Slide 6: Core Topic - Definition -->
-                <div class="slide" data-title="핵심 주제">
-                    <div class="slide-content">
-                        <h2 class="section-title text-4xl mb-8">2.1. 코칭의 본질과 정의</h2>
-                        <div class="card p-8">
-                            <div class="grid md:grid-cols-2 gap-x-12">
-                                <!-- 성과 -->
-                                <div>
-                                    <h3 class="text-2xl font-bold text-green-700 mb-4">성과: 개념의 구체화</h3>
-                                    <ul class="list-disc list-outside pl-5 space-y-3">
-                                        <li><strong>다양한 관점 확보:</strong> 자기주도학습(Grant), 조직 효율성(Kilburg), 소크라테스식 대화(Passmore) 등 다각적 정의가 등장하며 논의가 풍부해짐.</li>
-                                        <li><strong>'코칭 심리학'의 정립:</strong> 심리학적 접근을 기반으로 웰빙과 성과를 향상시키는 학문적 영역으로 개념이 확장되고 정립됨.</li>
-                                    </ul>
-                                </div>
-                                <!-- 한계 -->
-                                <div>
-                                    <h3 class="text-2xl font-bold text-red-700 mb-4">한계: 통일된 정의의 부재</h3>
-                                    <ul class="list-disc list-outside pl-5 space-y-3">
-                                        <li><strong>정의의 파편화:</strong> 통일된 정의가 없어 연구 간 비교가 어렵고, 현장에서는 멘토링, 컨설팅과 혼용되는 등 혼란을 야기함.</li>
-                                        <li><strong>초기 개념의 한계:</strong> 초기 '코칭 심리학' 정의는 치료적 접근에 편중되어 다양한 조직 프랙티스 기반 접근법의 발전을 제한할 수 있다는 비판에 직면했음.</li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Slide 7: Core Topic - Coach -->
-                <div class="slide" data-title="핵심 주제">
-                    <div class="slide-content">
-                        <h2 class="section-title text-4xl mb-8">2.2. 코치의 행동과 역량</h2>
-                        <div class="card p-8">
-                            <div class="grid md:grid-cols-2 gap-x-12">
-                                <!-- 성과 -->
-                                <div>
-                                    <h3 class="text-2xl font-bold text-green-700 mb-4">성과: 핵심 역량 식별</h3>
-                                    <ul class="list-disc list-outside pl-5 space-y-3">
-                                        <li><strong>공통 역량 도출:</strong> 여러 연구(Hall et al., Jarvis et al.)를 통해 경청, 질문, 도전, 자기인식 등 코치의 핵심 역량이 공통적으로 식별됨.</li>
-                                        <li><strong>배경에 따른 차이 이해:</strong> 코치의 전문 배경(심리학 vs. 비심리학)에 따라 평가 역량과 질문 역량 등 중점을 두는 부분이 다름을 발견 (Bono et al.).</li>
-                                    </ul>
-                                </div>
-                                <!-- 한계 -->
-                                <div>
-                                    <h3 class="text-2xl font-bold text-red-700 mb-4">한계: 역량 모델의 불완전성</h3>
-                                    <ul class="list-disc list-outside pl-5 space-y-3">
-                                        <li><strong>맥락적 이해 부족:</strong> 어떤 상황에서 어떤 역량이 더 중요한지에 대한 연구가 부족함. 역량 목록 나열을 넘어, 역량 간의 상호작용과 실제 성과 기여도에 대한 심층 분석이 필요.</li>
-                                        <li><strong>'효과적인 코치'의 모호성:</strong> 배경에 따른 역량 초점 차이가 실제 코칭 효과에 어떤 영향을 미치는지에 대한 실증적 증거는 아직 부족함.</li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Slide 8: Core Topic - Client & Relationship -->
-                 <div class="slide" data-title="핵심 주제">
-                    <div class="slide-content">
-                        <h2 class="section-title text-4xl mb-8">2.3 & 2.4. 대상자 요인과 관계</h2>
-                        <div class="card p-8">
-                            <div class="grid md:grid-cols-2 gap-x-12">
-                                <!-- 성과 -->
-                                <div>
-                                    <h3 class="text-2xl font-bold text-green-700 mb-4">성과: 성공의 핵심 동인 발견</h3>
-                                    <ul class="list-disc list-outside pl-5 space-y-3">
-                                        <li><strong>대상자의 중요성 확인:</strong> '변화 준비도'와 '학습 동기' 등 대상자의 내적 요인이 코칭 성공에 결정적임을 확인함.</li>
-                                        <li><strong>관계의 질 강조:</strong> 코칭 성공의 가장 일관되고 강력한 예측 변수가 '코치-클라이언트 관계의 질'임을 명확히 함 (Wasylyshyn, 2003 등).</li>
-                                    </ul>
-                                </div>
-                                <!-- 한계 -->
-                                <div>
-                                    <h3 class="text-2xl font-bold text-red-700 mb-4">한계: 측정과 기제 연구 부족</h3>
-                                    <ul class="list-disc list-outside pl-5 space-y-3">
-                                        <li><strong>측정 도구의 부재:</strong> '변화 준비도'와 같은 핵심 변수를 신뢰성 있게 측정할 표준화된 도구가 부족하여 연구와 실무 적용에 어려움.</li>
-                                        <li><strong>'관계'의 블랙박스:</strong> 관계가 중요하다는 것은 알지만, 신뢰가 어떻게 형성되고, 도전과 지지의 최적 균형은 무엇인지 등 관계의 구체적인 작동 기제에 대한 이해는 아직 초기 단계.</li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Slide 9: Core Topic - Impact/ROI -->
-                <div class="slide" data-title="핵심 주제">
-                    <div class="slide-content">
-                        <h2 class="section-title text-4xl mb-8">2.5. 코칭의 조직적 영향과 ROI</h2>
-                        <div class="card p-8">
-                            <div class="grid md:grid-cols-2 gap-x-12">
-                                <!-- 성과 -->
-                                <div>
-                                    <h3 class="text-2xl font-bold text-green-700 mb-4">성과: 긍정적 효과 입증</h3>
-                                    <ul class="list-disc list-outside pl-5 space-y-3">
-                                        <li><strong>ROI 증거 확보:</strong> 메타분석(De Meuse et al., 2009)을 통해 코칭이 성과에 긍정적인 영향을 미친다는 통계적 증거를 제시함 (타인평가 효과크기 0.60).</li>
-                                        <li><strong>다양한 연구 축적:</strong> 개별 연구들을 통해 코칭의 효과를 반복적으로 확인하며 비즈니스 케이스를 강화함.</li>
-                                    </ul>
-                                </div>
-                                <!-- 한계 -->
-                                <div>
-                                    <h3 class="text-2xl font-bold text-red-700 mb-4">한계: 효과의 불안정성</h3>
-                                    <ul class="list-disc list-outside pl-5 space-y-3">
-                                        <li><strong>극심한 편차:</strong> 메타분석에 포함된 연구들의 효과 크기 편차가 매우 큼 (예: 타인평가 0.06 ~ 1.83). 이는 코칭 효과가 보편적이지 않고 <span class="highlight">상황에 따라 크게 달라짐</span>을 의미.</li>
-                                        <li><strong>인과관계의 불명확성:</strong> ROI를 명확히 측정하기 어렵고, 코칭 외 다른 변수들의 영향을 통제하기 어려워 코칭만의 순수한 효과를 입증하는 데 한계가 있음.</li>
-                                    </ul>
-                                </div>
-                            </div>
-                            <div class="critical-view mt-8">
-                                <p class="font-bold">저자의 핵심 통찰: 효과 크기의 막대한 편차는 "코칭 효과가 <span class='text-orange-900'>상황적(situational)</span>이며, 특정 개인 및 조직 상황에서 더 강력하게 나타날 수 있음"을 시사한다.</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Slide 10: Methodology -->
-                <div class="slide" data-title="방법론">
-                    <div class="slide-content">
-                        <h2 class="section-title text-4xl mb-8">3. 코칭 연구 방법론의 진보</h2>
-                        <div class="card p-8">
-                            <div class="grid md:grid-cols-2 gap-x-12">
-                                <!-- 성과 -->
-                                <div>
-                                    <h3 class="text-2xl font-bold text-green-700 mb-4">성과: 학문적 엄격성 강화</h3>
-                                    <ul class="list-disc list-outside pl-5 space-y-3">
-                                        <li><strong>패러다임 전환:</strong> 단순 사례연구 위주의 탐색적 단계를 벗어나, 이론을 검증하는 성숙 단계로 진입함.</li>
-                                        <li><strong>다양한 방법론 도입:</strong> 무선통제실험(RCT), 메타분석 등 엄격한 양적 연구와 IPA, 근거이론 등 심층적인 질적 연구가 활발히 도입됨.</li>
-                                    </ul>
-                                </div>
-                                <!-- 한계 -->
-                                <div>
-                                    <h3 class="text-2xl font-bold text-red-700 mb-4">한계: 여전한 연구 설계의 과제</h3>
-                                    <ul class="list-disc list-outside pl-5 space-y-3">
-                                        <li><strong>통제집단 설정의 어려움:</strong> 실제 조직 환경에서 엄격한 통제집단을 설정하기 어려워, 코칭의 순수 효과를 분리해내기 힘든 경우가 많음.</li>
-                                        <li><strong>복잡성 측정의 한계:</strong> 코칭 과정의 미묘한 상호작용과 맥락적 요인을 기존의 방법론으로 온전히 포착하는 데에는 여전히 한계가 존재함.</li>
-                                    </ul>
-                                </div>
-                            </div>
-                            <div class="mt-8 p-6 bg-slate-50 rounded-lg text-center">
-                                 <p class="text-slate-600">"탐구 및 정의 단계에서 벗어나면서... 이론 생성에 의해 촉발된 연구 질문에 적합한 설계로의 전환이 이루어졌다." (Passmore & Fillery-Travis, 2011)</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Slide 11: Future Agenda -->
-                <div class="slide" data-title="미래 과제">
-                       <div class="slide-content">
-                            <h2 class="section-title text-4xl mb-8">4. 미래 연구 방향: 6가지 핵심 과제</h2>
-                            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                <div class="card p-6 h-full">
-                                    <p class="text-3xl mb-3">🎯</p><p class="font-extrabold text-lg text-amber-800 mb-2">1. 개입 방식 선정</p>
-                                    <p class="text-sm">언제 코칭이 다른 개발 방식(멘토링, 교육 등)보다 더 효과적인가? 명확한 기준 수립이 필요.</p>
-                                </div>
-                                <div class="card p-6 h-full">
-                                     <p class="text-3xl mb-3">🏢</p><p class="font-extrabold text-lg text-amber-800 mb-2">2. 코칭 문화와 조직 변화</p>
-                                    <p class="text-sm">코칭을 일회성 개입이 아닌, 조직의 경영 스타일로 정착시키기 위한 조건과 방법은 무엇인가?</p>
-                                </div>
-                                <div class="card p-6 h-full">
-                                     <p class="text-3xl mb-3">🤝</p><p class="font-extrabold text-lg text-amber-800 mb-2">3. 코칭 관계의 핵심 요소</p>
-                                    <p class="text-sm">'도전과 지지의 균형', '신뢰 형성 과정' 등 관계의 어떤 구체적 측면이 결과를 이끄는가?</p>
-                                </div>
-                                <div class="card p-6 h-full">
-                                     <p class="text-3xl mb-3">📋</p><p class="font-extrabold text-lg text-amber-800 mb-2">4. 클라이언트 준비도</p>
-                                    <p class="text-sm">변화 준비도를 측정할 <span class="highlight">'짧고 타당화된 설문지'</span> 개발이 시급. 문제별 최적의 접근법을 찾아야 함 ('애니멀 팜 효과' 가설 검증).</p>
-                                    <div class="explanation-box text-xs">"모든 방법은 평등하지만, 어떤 방법은 다른 방법보다 더 평등하다"는 가설. 즉, 특정 문제에는 특정 코칭법이 더 효과적일 수 있음을 의미 (예: 중독 문제에 MI, 우울증에 CBT).</div>
-                                </div>
-                                <div class="card p-6 h-full">
-                                     <p class="text-3xl mb-3">🧑‍🏫</p><p class="font-extrabold text-lg text-amber-800 mb-2">5. 코치의 성장</p>
-                                    <p class="text-sm">코칭 경험이 코치 자신의 리더십, 회복탄력성, 정서지능 등에 미치는 긍정적 영향은 무엇인가?</p>
-                                </div>
-                                <div class="card p-6 h-full">
-                                     <p class="text-3xl mb-3">🌍</p><p class="font-extrabold text-lg text-amber-800 mb-2">6. 사회적 변화의 동인</p>
-                                    <p class="text-sm">교육(성취도 향상), 헬스케어(사고율 감소) 등 더 넓은 사회 문제 해결에 코칭이 어떻게 기여할 수 있는가?</p>
-                                </div>
-                            </div>
-                       </div>
-                </div>
-                
-                <!-- Slide 12: Conclusion -->
-                <div class="slide" data-title="결론">
-                       <div class="slide-content">
-                            <h2 class="section-title text-4xl mb-8">5. 결론</h2>
-                            <div class="card p-12">
-                                <ul class="space-y-6 text-xl">
-                                    <li class="flex items-start">
-                                        <span class="text-green-500 font-bold mr-4 text-2xl">✓</span>
-                                        <div><strong class="text-slate-900">괄목할 만한 성장:</strong> 지난 10년간 코칭 연구는 탐색 단계를 지나 이론을 구축하는 성숙 단계로 진입함.</div>
-                                    </li>
-                                    <li class="flex items-start">
-                                        <span class="text-blue-500 font-bold mr-4 text-2xl">✓</span>
-                                        <div><strong class="text-slate-900">명확한 의제 수립:</strong> 미래 연구를 위한 6가지 핵심 과제가 제시되어, 연구의 방향성을 확립함.</div>
-                                    </li>
-                                     <li class="flex items-start">
-                                        <span class="text-amber-600 font-bold mr-4 text-2xl">✓</span>
-                                        <div><strong class="text-slate-900">핵심 과제:</strong> 지속적인 발전을 위해 연구의 <span class="highlight">학문적 엄격성</span>을 높이고, <span class="highlight">연구자와 현장 실무가 간의 파트너십</span>을 강화하는 것이 무엇보다 중요함.</div>
-                                    </li>
-                                </ul>
-                            </div>
-                       </div>
-                </div>
-
-                <!-- NEW Slide 13: Discussion Topics -->
-                <div class="slide" data-title="토의 주제">
-                    <div class="slide-content">
-                        <h2 class="section-title text-4xl mb-8">세부 토의 질문</h2>
-                        <div class="card p-10">
-                            <ol class="list-decimal list-outside pl-5 space-y-8 text-xl">
-                                <li>임원의 복잡한 심리적 장벽을 다루기 위해 심리학적 지식과 훈련은 필수적이라고 생각하는가? 아니면 조직의 현실과 비즈니스 성과에 대한 깊은 이해가 더 중요하다고 생각하는가?</li>
-                                <li>논문에서 가장 중요하다고 강조한 '관계의 질'(신뢰, 공감 등)을 형성하는 데 더 유리한 배경은 무엇이라고 생각하며, 그 이유는 무엇인가?</li>
-                                <li>만약 당신이 CEO라면, 어떤 배경을 가진 코치를 당신의 임원들을 위해 고용하겠는가? 그 선택의 기준은 무엇인가?</li>
-                            </ol>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Slide 14: Q&A -->
-                <div class="slide" data-title="Q&A">
-                    <div class="slide-content text-center">
-                        <h2 class="section-title text-6xl font-black">Q & A</h2>
-                        <p class="mt-8 text-3xl" style="color: #595147;">경청해주셔서 감사합니다.</p>
-                    </div>
-                </div>
-
             </div>
 
-            <!-- Accessibility improvement: added aria-label -->
-            <button id="prev-btn" class="nav-button" aria-label="이전 슬라이드">&#x276E;</button>
-            <button id="next-btn" class="nav-button" aria-label="다음 슬라이드">&#x276F;</button>
-            
-            <div class="progress-indicator">
-                <div id="slide-number" class="slide-number"></div>
-                <div class="progress-bar-container">
-                    <div id="progress-bar" class="progress-bar"></div>
+            <div class="slide">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-2xl font-bold text-[#06D6A0]">M2: 거절을 기회로 바꾸는 대처법</h2>
+                    <span class="font-bold text-gray-400">Page 2 / 3</span>
+                </div>
+                <div class="flex-grow flex flex-col justify-center">
+                    <h3 class="text-xl font-bold mb-4 text-center">✨ AI와 함께하는 거절 극복 훈련</h3>
+                    <p class="text-sm text-gray-600 mb-6 text-center">고객의 실제 거절 멘트를 입력하고, AI가 제안하는 다양한 대처법을 확인해 보세요.</p>
+                    <div class="max-w-xl mx-auto w-full">
+                        <textarea id="objection-input" class="w-full p-2 border border-gray-300 rounded-md" rows="3" placeholder="예: '지금은 바빠요', '가격이 너무 비싸네요'"></textarea>
+                        <button id="objection-handler-btn" class="gemini-button w-full mt-2">✨ 대처법 생성하기</button>
+                    </div>
                 </div>
             </div>
-        </main>
+
+            <div class="slide">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-2xl font-bold text-[#FF6B6B]">M3: AI를 활용한 고객 관리</h2>
+                     <span class="font-bold text-gray-400">Page 3 / 3</span>
+                </div>
+                <div class="flex-grow flex flex-col justify-center">
+                    <h3 class="text-xl font-bold mb-4 text-center">✨ AI 후속 메시지 초안 작성 도우미</h3>
+                    <p class="text-sm text-gray-600 mb-6 text-center">미팅의 핵심 내용을 간략히 입력하면 AI가 고객에게 보낼 후속 메시지 초안을 작성해 줍니다.</p>
+                    <div class="max-w-xl mx-auto w-full">
+                        <textarea id="meeting-notes-input" class="w-full p-2 border border-gray-300 rounded-md" rows="4" placeholder="미팅 날짜, 논의된 고객의 문제점, 제안한 해결책, 다음 단계 등을 입력하세요."></textarea>
+                        <button id="followup-generator-btn" class="gemini-button w-full mt-2">✨ 후속 메시지 초안 작성</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div id="gemini-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50 flex items-center justify-center">
+        <div class="relative mx-auto p-5 border w-full max-w-2xl shadow-lg rounded-md bg-white">
+            <div class="mt-3">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 id="modal-title" class="text-lg leading-6 font-bold text-gray-900">AI 생성 결과</h3>
+                    <button id="close-modal-button" class="text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
+                </div>
+                <div id="modal-content" class="mt-2 px-2 py-3 max-h-96 overflow-y-auto">
+                    <div id="modal-loader" class="flex justify-center items-center py-10">
+                        <div class="spinner"></div>
+                        <p class="ml-4">생성 중입니다. 잠시만 기다려주세요...</p>
+                    </div>
+                    <p id="modal-text" class="text-sm text-gray-700 text-left whitespace-pre-wrap"></p>
+                </div>
+                <div class="flex justify-end items-center px-4 py-3 border-t">
+                    <span id="copy-success" class="text-sm text-green-600 mr-4 hidden">복사 완료!</span>
+                    <button id="regenerate-button" class="gemini-button mr-2">✨ 다시 생성</button>
+                    <button id="copy-button" class="bg-gray-200 text-gray-800 font-bold py-2 px-4 rounded hover:bg-gray-300 mr-2">복사하기</button>
+                </div>
+            </div>
+        </div>
     </div>
-
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-    const sliderContainer = document.getElementById('slider-container');
-    const slides = document.querySelectorAll('.slide');
-    const prevBtn = document.getElementById('prev-btn');
-    const nextBtn = document.getElementById('next-btn');
-    const slideNumberDisplay = document.getElementById('slide-number');
-    const progressBar = document.getElementById('progress-bar');
-    const contentArea = document.querySelector('.content-area');
     
-    let currentSlide = 0;
-    const totalSlides = slides.length;
+    <footer class="bg-[#073B4C] text-white text-center py-6 px-4">
+        <p>&copy; 2025 Sales Growth Program. All Rights Reserved.</p>
+    </footer>
 
-    function updateSlidePosition() {
-        sliderContainer.style.transform = `translateX(-${currentSlide * 100}%)`;
-        
-        slides.forEach((slide, index) => {
-            if(index === currentSlide) {
-                slide.classList.add('active');
-            } else {
-                slide.classList.remove('active');
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // SLIDESHOW LOGIC
+            const slides = document.querySelectorAll('.slide');
+            const prevBtn = document.getElementById('prev-btn');
+            const nextBtn = document.getElementById('next-btn');
+            let currentSlide = 0;
+
+            function showSlide(index) {
+                slides.forEach((slide, i) => {
+                    if (i === index) {
+                        slide.classList.remove('hidden');
+                    } else {
+                        slide.classList.add('hidden');
+                    }
+                });
             }
+
+            function nextSlide() {
+                currentSlide = (currentSlide + 1) % slides.length;
+                showSlide(currentSlide);
+            }
+
+            function prevSlide() {
+                currentSlide = (currentSlide - 1 + slides.length) % slides.length;
+                showSlide(currentSlide);
+            }
+
+            prevBtn.addEventListener('click', prevSlide);
+            nextBtn.addEventListener('click', nextSlide);
+            
+            showSlide(currentSlide);
+
+            // MODAL AND GEMINI API LOGIC
+            const modal = document.getElementById('gemini-modal');
+            const modalTitle = document.getElementById('modal-title');
+            const modalLoader = document.getElementById('modal-loader');
+            const modalText = document.getElementById('modal-text');
+            const closeModalButton = document.getElementById('close-modal-button');
+            const regenerateButton = document.getElementById('regenerate-button');
+            const copyButton = document.getElementById('copy-button');
+            const copySuccessMessage = document.getElementById('copy-success');
+
+            let lastPrompt = '';
+
+            const openModal = () => modal.classList.remove('hidden');
+            const closeModal = () => modal.classList.add('hidden');
+
+            closeModalButton.addEventListener('click', closeModal);
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) closeModal();
+            });
+
+            async function callGeminiAPI(prompt, retries = 3, delay = 1000) {
+                const apiKey = ""; 
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+                const payload = { contents: [{ parts: [{ text: prompt }] }] };
+
+                try {
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+
+                    const result = await response.json();
+                    return result.candidates?.[0]?.content?.parts?.[0]?.text || "결과를 생성할 수 없습니다. 다시 시도해 주세요.";
+                } catch (error) {
+                    if (retries > 0) {
+                        await new Promise(res => setTimeout(res, delay));
+                        return callGeminiAPI(prompt, retries - 1, delay * 2);
+                    } else {
+                        return "오류가 발생했습니다. 잠시 후 다시 시도해 주세요.";
+                    }
+                }
+            }
+
+            async function generateContent(prompt, title) {
+                lastPrompt = prompt;
+                modalTitle.textContent = title;
+                modalText.textContent = '';
+                modalLoader.style.display = 'flex';
+                copySuccessMessage.classList.add('hidden');
+                openModal();
+                
+                const result = await callGeminiAPI(prompt);
+                
+                modalLoader.style.display = 'none';
+                modalText.textContent = result.trim();
+            }
+            
+            regenerateButton.addEventListener('click', () => {
+                if(lastPrompt) {
+                    generateContent(lastPrompt, modalTitle.textContent);
+                }
+            });
+
+            copyButton.addEventListener('click', () => {
+                const textToCopy = modalText.textContent;
+                const textArea = document.createElement('textarea');
+                textArea.value = textToCopy;
+                document.body.appendChild(textArea);
+                textArea.select();
+                try {
+                    document.execCommand('copy');
+                    copySuccessMessage.classList.remove('hidden');
+                    setTimeout(() => copySuccessMessage.classList.add('hidden'), 2000);
+                } catch (err) {
+                    console.error('Failed to copy text: ', err);
+                }
+                document.body.removeChild(textArea);
+            });
+
+            document.querySelectorAll('.script-generator-btn').forEach(button => {
+                button.addEventListener('click', () => {
+                    const type = button.dataset.type;
+                    const desc = button.dataset.desc;
+                    const prompt = `당신은 최고의 세일즈 코치입니다. '${type}' 고객에게 사용할 짧고 효과적인 첫 만남 스크립트를 한국어로 작성해 주세요. 이 고객의 특징은 다음과 같습니다: "${desc}". 스크립트는 친근하고 전문적이어야 하며, 빠르게 신뢰를 형성하는 것을 목표로 해야 합니다.`;
+                    generateContent(prompt, `'${type}' 고객 맞춤 스크립트`);
+                });
+            });
+
+            document.getElementById('objection-handler-btn')?.addEventListener('click', () => {
+                const objectionInput = document.getElementById('objection-input');
+                const objection = objectionInput.value.trim();
+                if (!objection) {
+                    alert('고객의 거절 멘트를 입력해 주세요.');
+                    return;
+                }
+                const prompt = `당신은 세계적인 세일즈 멘토입니다. 고객이 방금 "${objection}"이라는 거절을 했습니다. 이 상황에 영업사원이 대응할 수 있는 3가지 독창적이고 실행 가능한 전략을 한국어로 제안해 주세요. 각 전략은 간결하게 설명되어야 하고, 전문적인 어조를 유지해야 합니다. 번호 목록 형식으로 답변해 주세요.`;
+                generateContent(prompt, `"${objection}"에 대한 대처법`);
+            });
+            
+            document.getElementById('followup-generator-btn')?.addEventListener('click', () => {
+                const notesInput = document.getElementById('meeting-notes-input');
+                const notes = notesInput.value.trim();
+                 if (!notes) {
+                    alert('미팅 핵심 내용을 입력해 주세요.');
+                    return;
+                }
+                const prompt = `당신은 전문적인 세일즈 어시스턴트입니다. 다음 미팅 노트를 기반으로 간결하고 정중한 후속 메시지(이메일 또는 문자) 초안을 한국어로 작성해 주세요. 메시지는 고객에게 감사 인사를 전하고, 핵심 내용을 요약하며, 다음 단계를 명확하게 제시해야 합니다.\n\n미팅 노트:\n"${notes}"`;
+                generateContent(prompt, "후속 메시지 초안");
+            });
+
         });
-
-        const progress = ((currentSlide + 1) / totalSlides) * 100;
-        progressBar.style.width = `${progress}%`;
-        slideNumberDisplay.textContent = `${currentSlide + 1} / ${totalSlides}`;
-        
-        prevBtn.style.display = currentSlide === 0 ? 'none' : 'flex';
-        nextBtn.style.display = currentSlide === totalSlides - 1 ? 'none' : 'flex';
-    }
-
-    function goToNextSlide() {
-        if (currentSlide < totalSlides - 1) {
-            currentSlide++;
-            updateSlidePosition();
-        }
-    }
-
-    function goToPrevSlide() {
-        if (currentSlide > 0) {
-            currentSlide--;
-            updateSlidePosition();
-        }
-    }
-    
-    // --- Event Listeners ---
-
-    nextBtn.addEventListener('click', goToNextSlide);
-    prevBtn.addEventListener('click', goToPrevSlide);
-
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'ArrowRight') {
-            goToNextSlide();
-        } else if (e.key === 'ArrowLeft') {
-            goToPrevSlide();
-        }
-    });
-
-    // --- NEW: Swipe navigation for touch devices ---
-    let touchstartX = 0;
-    let touchendX = 0;
-
-    contentArea.addEventListener('touchstart', function(event) {
-        // To prevent swipe when scrolling content
-        if (event.target.closest('.slide-content')?.scrollTop > 0) return;
-        touchstartX = event.changedTouches[0].screenX;
-    }, { passive: true });
-
-    contentArea.addEventListener('touchend', function(event) {
-        touchendX = event.changedTouches[0].screenX;
-        handleSwipe();
-    }, { passive: true }); 
-
-    function handleSwipe() {
-        const swipeThreshold = 50; // minimum distance for a swipe in pixels
-        if (touchendX < touchstartX - swipeThreshold) {
-            goToNextSlide();
-        }
-        if (touchendX > touchstartX + swipeThreshold) {
-            goToPrevSlide();
-        }
-    }
-    // --- End of new swipe logic ---
-
-    // Initial setup
-    updateSlidePosition();
-});
-</script>
-
+    </script>
 </body>
 </html>
 
