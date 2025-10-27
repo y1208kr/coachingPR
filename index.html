@@ -3,313 +3,438 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI 기반 영업 교육 슬라이드쇼</title>
+    <title>AI 면접 시스템 공정성 품질 평가 (발표자료)</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary-dark': '#00449E',
+                        'primary': '#005BC6',
+                        'primary-accent': '#0072F0',
+                        'primary-light': '#59A1FF',
+                        'primary-lighter': '#9ECBFF',
+                    },
+                    fontFamily: {
+                        'sans': ['Noto Sans KR', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
     <style>
         body {
-            font-family: 'Noto Sans KR', sans-serif;
-            background-color: #f0f2f5;
+            word-break: keep-all;
         }
         .slide {
-            background-color: white;
-            border-radius: 0.5rem;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-            padding: 2rem;
-            display: flex;
+            width: 100%;
+            height: 100vh;
+            display: none;
             flex-direction: column;
             justify-content: center;
-            min-height: 600px;
+            align-items: center;
+            padding: 2.5rem;
+            text-align: center;
+            position: absolute;
+            left: 0;
+            top: 0;
+            transition: opacity 0.5s ease-in-out;
+            opacity: 0;
         }
-        .chart-container {
-            position: relative;
+        .slide.active {
+            display: flex;
+            opacity: 1;
+            z-index: 10;
+        }
+        .slide-content {
+            max-width: 1000px;
             width: 100%;
-            height: 100%;
-            min-height: 300px;
-            max-height: 450px;
-            margin-left: auto;
-            margin-right: auto;
         }
-        .gemini-button {
-            background-color: #118AB2;
+        .slide-content p, .slide-content li, .slide-content h3, .slide-content h4, .slide-content div {
+            word-break: keep-all;
+        }
+        .icon-box {
+            font-size: 3rem;
+            line-height: 1;
+        }
+        .balance-diagram {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 1rem;
+        }
+        .balance-item {
+            flex-basis: 45%;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            text-align: center;
+        }
+        .black-box {
+            background-color: #2d3748; /* gray-800 */
             color: white;
+            padding: 2rem;
+            border-radius: 0.5rem;
+            position: relative;
+            width: 200px;
+            height: 200px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2rem;
             font-weight: bold;
-            padding: 0.5rem 1rem;
-            border-radius: 0.375rem;
-            transition: background-color 0.3s;
         }
-        .gemini-button:hover {
-            background-color: #073B4C;
+        .black-box-q {
+            position: absolute;
+            font-size: 2rem;
+            font-weight: bold;
+            color: #E53E3E; /* red-600 */
         }
-        .spinner {
-            border: 4px solid rgba(0, 0, 0, 0.1);
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            border-left-color: #118AB2;
-            animation: spin 1s ease infinite;
+        .nav-btn {
+            position: fixed;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 20;
+            background-color: rgba(0, 68, 158, 0.7);
+            color: white;
+            border-radius: 9999px;
+            width: 3.5rem;
+            height: 3.5rem;
+            font-size: 2rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
         }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        .nav-btn:hover {
+            background-color: rgba(0, 89, 198, 1);
+        }
+        #prevBtn {
+            left: 1.5rem;
+        }
+        #nextBtn {
+            right: 1.5rem;
         }
     </style>
 </head>
-<body class="bg-gray-100 text-[#073B4C]">
+<body class="bg-gray-100 text-gray-800 font-sans">
 
-    <header class="bg-[#073B4C] text-white text-center py-8 px-4">
-        <h1 class="text-4xl md:text-5xl font-black mb-2">AI 기반 영업 전문가 성장 프로그램</h1>
-        <p class="text-lg md:text-xl text-[#FFD166]">AI와 함께 실전 역량을 강화하는 3단계 핵심 모듈</p>
-    </header>
+    <div id="presentation-container" class="relative w-full h-screen overflow-hidden">
 
-    <main class="container mx-auto p-4 md:p-8 max-w-5xl">
-        <div id="slideshow-container" class="relative">
-            <button id="prev-btn" class="absolute top-1/2 -left-4 md:-left-16 transform -translate-y-1/2 bg-white/70 hover:bg-white focus:outline-none shadow-md rounded-full w-12 h-12 flex items-center justify-center text-2xl font-bold text-gray-700 z-10 transition-colors">❮</button>
-            <button id="next-btn" class="absolute top-1/2 -right-4 md:-right-16 transform -translate-y-1/2 bg-white/70 hover:bg-white focus:outline-none shadow-md rounded-full w-12 h-12 flex items-center justify-center text-2xl font-bold text-gray-700 z-10 transition-colors">❯</button>
+        <section class="slide active">
+            <div class="slide-content text-center">
+                <h1 class="text-4xl md:text-5xl font-bold text-primary-dark mb-4">AI 면접 시스템의 공정성 품질 평가</h1>
+                <p class="text-2xl md:text-3xl text-primary-accent font-medium mb-8">4차원 공정성 모델을 중심으로</p>
+                <p class="text-xl text-gray-700">품질경영 (정욱 교수님)</p>
+                <p class="text-lg text-gray-600 mt-4">동국대학원 경영학과 인사조직 박사과정 염승빈 (2025127099)</p>
+            </div>
+        </section>
 
-            <div class="slide">
-                <div class="flex justify-between items-center mb-4">
-                    <h2 class="text-2xl font-bold text-[#118AB2]">M1: 고객 유형별 맞춤 접근법</h2>
-                    <span class="font-bold text-gray-400">Page 1 / 3</span>
+        <section class="slide">
+            <div class="slide-content">
+                <h2 class="text-3xl md:text-4xl font-bold text-primary-dark mb-6">[WHY] 연구 배경 및 문제 제기</h2>
+                <div class="bg-white p-8 rounded-lg shadow-xl text-left text-lg space-y-4">
+                    <ul class="list-none space-y-4">
+                        <li class="flex items-start">
+                            <span class="text-3xl mr-4 text-primary-dark font-bold">1.</span>
+                            <div><b>전통적 채용의 한계:</b> 면접관 주관, 편향 개입, 높은 시간/비용 (Gilliland, 1993; 문혜진 & 남상희, 2022).</div>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-3xl mr-4 text-primary-dark font-bold">2.</span>
+                            <div><b>기술적 대안 등장:</b> AI 면접 시스템 도입으로 효율성 및 객관성(일관성) 확보 기대 (문혜진 & 남상희, 2022).</div>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-3xl mr-4 text-red-500 font-bold">3.</span>
+                            <div><b class="font-bold text-primary-dark">새로운 품질 문제 발생:</b> '효율성'을 위해 도입된 AI가 '공정성'과 '신뢰'라는 또 다른 차원의 품질 문제를 야기함.</div>
+                        </li>
+                    </ul>
                 </div>
-                 <div class="flex-grow flex flex-col justify-center">
-                    <h3 class="text-xl font-bold mb-4 text-center">AI를 활용한 고객 유형별 스크립트 생성</h3>
-                    <p class="text-sm text-gray-600 mb-6 text-center max-w-2xl mx-auto">대표 고객 유형의 특성을 이해하고 AI의 도움을 받아 맞춤형 접근 스크립트를 즉시 생성해 보세요.</p>
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                        <div id="type-data" class="flex flex-col items-center p-4 border border-gray-200 rounded-lg text-center">
-                            <span class="text-4xl mb-2">📊</span>
-                            <h4 class="font-bold">데이터 신봉형</h4>
-                            <p class="text-sm text-gray-600 mt-1 mb-4">숫자와 데이터 기반의 명확한 근거를 제시할 때 신뢰하며, 효율성과 ROI를 가장 중요하게 생각합니다.</p>
-                            <button class="gemini-button script-generator-btn mt-auto" data-type="데이터 신봉형" data-desc="숫자와 데이터 기반의 명확한 근거를 제시할 때 신뢰하며, 효율성과 ROI를 가장 중요하게 생각합니다.">✨ 맞춤 스크립트 생성</button>
+            </div>
+        </section>
+
+        <section class="slide">
+            <div class="slide-content">
+                <h2 class="text-3xl md:text-4xl font-bold text-primary-dark mb-8">[WHY] AI 면접의 새로운 품질 문제</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+                    <div class="bg-red-100 border-l-4 border-red-500 text-red-800 p-6 rounded-lg shadow-md text-left">
+                        <h3 class="text-xl font-bold mb-2">알고리즘 편향</h3>
+                        <p class="text-red-700">훈련 데이터의 편견을 AI가 학습하고 재생산함 (Robert et al., 2020; 문혜진 & 남상희, 2022).</p>
+                    </div>
+                    <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-800 p-6 rounded-lg shadow-md text-left">
+                        <h3 class="text-xl font-bold mb-2">블랙박스 (Black Box)</h3>
+                        <p class="text-yellow-700">불투명한 평가 과정이 지원자에게 불확실성과 불신을 초래함 (심동녘 & 인혁준, 2023).</p>
+                    </div>
+                    <div class="bg-blue-100 border-l-4 border-blue-500 text-blue-800 p-6 rounded-lg shadow-md text-left">
+                        <h3 class="text-xl font-bold mb-2">비인간화 (Dehumanizing)</h3>
+                        <p class="text-blue-700">기계와의 일방향적 소통이 비인간적 경험을 제공함 (Langer et al., 2019; 문혜진 & 남상희, 2022).</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="slide">
+            <div class="slide-content">
+                <h2 class="text-3xl md:text-4xl font-bold text-primary-dark mb-6">[WHAT] 연구 목적 및 질문</h2>
+                <div class="bg-white p-8 rounded-lg shadow-xl text-left text-lg space-y-4">
+                    <h3 class="text-xl font-bold text-primary-dark">연구 목적</h3>
+                    <ul class="list-disc pl-6 space-y-2">
+                        <li>4차원 공정성 모델(절차적, 분배적, 대인관계, 정보적)을 분석 틀로 적용.</li>
+                        <li>AI 면접 시스템의 공정성 품질 문제를 체계적으로 평가하고 그 한계를 탐색함 (Colquitt et al., 2001; Robert et al., 2020).</li>
+                    </ul>
+                    
+                    <h3 class="text-xl font-bold text-primary-dark mt-6">연구 질문</h3>
+                    <p class="italic">"4차원 공정성 모델 관점에서 AI 면접 시스템이 직면한 공정성 품질 과제는 무엇이며, 이에 대한 현재의 해결 노력과 궁극적인 한계점은 무엇인가?"</p>
+                </div>
+            </div>
+        </section>
+        
+        <section class="slide">
+            <div class="slide-content">
+                <h2 class="text-3xl md:text-4xl font-bold text-primary-dark mb-8">[HOW] 분석의 틀 1: 4차원 공정성 모델</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div class="bg-white p-6 rounded-lg shadow-lg border-t-4 border-primary-accent text-left">
+                        <h3 class="text-xl font-bold text-primary-dark mb-2">1. 절차적 공정성</h3>
+                        <p class="text-gray-600">"과정은 공정한가?"<br>일관성, 편향 억제, 수정 가능성 (Leventhal, 1980).</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-lg border-t-4 border-primary-light text-left">
+                        <h3 class="text-xl font-bold text-primary-dark mb-2">2. 분배적 공정성</h3>
+                        <p class="text-gray-600">"결과는 공정한가?"<br>결과의 형평성, 간접차별 여부 (Adams, 1965).</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-lg border-t-4 border-primary text-left">
+                        <h3 class="text-xl font-bold text-primary-dark mb-2">3. 대인관계 공정성</h3>
+                        <p class="text-gray-600">"대우는 공정한가?"<br>대인관계 존중, 예의 (Bies & Moag, 1986).</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-lg border-t-4 border-primary-dark text-left">
+                        <h3 class="text-xl font-bold text-primary-dark mb-2">4. 정보적 공정성</h3>
+                        <p class="text-gray-600">"설명은 공정한가?"<br>'블랙박스', 평가 기준의 투명성 (Colquitt et al., 2001).</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="slide">
+            <div class="slide-content">
+                <h2 class="text-3xl md:text-4xl font-bold text-primary-dark mb-8">[HOW] 분석의 틀 2: Garvin의 8대 품질 연계</h2>
+                <div class="bg-white p-8 rounded-lg shadow-xl text-left text-lg space-y-4">
+                    <p class="text-base">AI 면접 시스템의 품질은 Garvin의 8대 품질 차원으로 분석할 수 있음 (Garvin, 1987). 4차원 공정성 모델은 이 품질을 측정하는 도구임.</p>
+                    
+                    <h3 class="text-lg font-bold text-primary-dark pt-2">Garvin의 8대 품질 차원</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3 text-sm">
+                        <div class="flex items-start"><b class="text-primary-dark mr-2">1. 성능 (Performance):</b> 제품의 주요 작동 특성.</div>
+                        <div class="flex items-start"><b class="text-primary-dark mr-2">2. 특징 (Features):</b> 기본 기능을 보완하는 부가적 특성.</div>
+                        <div class="flex items-start"><b class="text-red-600 mr-2">3. 신뢰성 (Reliability):</b> 특정 기간 내 고장 없이 작동할 확률.</div>
+                        <div class="flex items-start"><b class="text-red-600 mr-2">4. 적합성 (Conformance):</b> 설계 및 운영 표준을 준수하는 정도.</div>
+                        <div class="flex items-start"><b class="text-primary-dark mr-2">5. 내구성 (Durability):</b> 제품의 물리적/경제적 수명.</div>
+                        <div class="flex items-start"><b class="text-red-600 mr-2">6. 서비스성 (Serviceability):</b> 수리의 용이성, 속도, 편의성.</div>
+                        <div class="flex items-start"><b class="text-primary-dark mr-2">7. 미학 (Aesthetics):</b> 제품의 감각적 측면 (외관, 느낌 등).</div>
+                        <div class="flex items-start"><b class="text-red-600 mr-2">8. 인지된 품질 (Perceived Quality):</b> 평판 등에 의한 주관적 품질 인식.</div>
+                    </div>
+
+                    <h3 class="text-lg font-bold text-primary-dark mt-4">본 연구의 핵심 연관 차원</h3>
+                    <ul class="list-none space-y-2 text-base">
+                        <li class="flex items-start pl-4"><span class="text-xl mr-2 text-red-500 font-bold">▪️</span><b>적합성(Conformance):</b> 알고리즘 편향 → '공정성 표준' 미준수.</li>
+                        <li class="flex items-start pl-4"><span class="text-xl mr-2 text-red-500 font-bold">▪️</span><b>신뢰성(Reliability):</b> '블랙박스' 문제 → 시스템 신뢰도 저하.</li>
+                        <li class="flex items-start pl-4"><span class="text-xl mr-2 text-red-500 font-bold">▪️</span><b>서비스성(Serviceability):</b> 이의제기 불가 → 오류 수정(서비스) 불가능.</li>
+                        <li class="flex items-start pl-4"><span class="text-xl mr-2 text-red-500 font-bold">▪️</span><b>인지된 품질(Perceived Quality):</b> '비인간화' 경험 → 지원자의 프로세스 품질 인식 급락.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section class="slide">
+            <div class="slide-content">
+                <h2 class="text-3xl md:text-4xl font-bold text-primary-dark mb-6">[WHAT] 분석 1: 절차적 공정성</h2>
+                <div class="bg-white p-8 rounded-lg shadow-xl text-left text-lg space-y-4">
+                    <h3 class="text-2xl font-bold text-primary-dark mb-4 text-center">적합성(Conformance) & 서비스성(Serviceability) 문제</h3>
+                    <div class="balance-diagram">
+                        <div class="balance-item bg-green-100 border border-green-300">
+                            <h4 class="text-xl font-bold text-green-800 my-2">표면적 강점: 일관성</h4>
+                            <p class="text-sm text-green-700">모든 지원자 동일 기준 적용 (문혜진 & 남상희, 2022).<br>Garvin의 '적합성' 품질을 표면적으로 충족하는 듯 보임.</p>
                         </div>
-                        <div id="type-relation" class="flex flex-col items-center p-4 border border-gray-200 rounded-lg text-center">
-                            <span class="text-4xl mb-2">🤝</span>
-                            <h4 class="font-bold">의리파 형님형</h4>
-                            <p class="text-sm text-gray-600 mt-1 mb-4">인간적인 관계와 신뢰를 우선시합니다. 꾸준한 관심과 진정성 있는 태도가 효과적입니다.</p>
-                            <button class="gemini-button script-generator-btn mt-auto" data-type="의리파 형님형" data-desc="인간적인 관계와 신뢰를 우선시합니다. 꾸준한 관심과 진정성 있는 태도가 효과적입니다.">✨ 맞춤 스크립트 생성</button>
-                        </div>
-                        <div id="type-careful" class="flex flex-col items-center p-4 border border-gray-200 rounded-lg text-center">
-                            <span class="text-4xl mb-2">🔍</span>
-                            <h4 class="font-bold">신중한 탐색가형</h4>
-                            <p class="text-sm text-gray-600 mt-1 mb-4">결정까지 다양한 정보를 비교하고 검토합니다. 충분한 정보와 선택지를 제공해야 합니다.</p>
-                            <button class="gemini-button script-generator-btn mt-auto" data-type="신중한 탐색가형" data-desc="결정까지 다양한 정보를 비교하고 검토합니다. 충분한 정보와 선택지를 제공해야 합니다.">✨ 맞춤 스크립트 생성</button>
+                        <div class="balance-item bg-red-100 border border-red-300">
+                            <h4 class="text-xl font-bold text-red-800 my-2">치명적 약점: 편향 & 수정 불가</h4>
+                            <p class="text-sm text-red-700"><b>[적합성 문제]</b> 편향 억제 한계 (Robert et al., 2020)<br><b>[서비스성 부재]</b> 수정/이의제기 불가 (Gilliland, 1993)</p>
                         </div>
                     </div>
                 </div>
             </div>
+        </section>
 
-            <div class="slide">
-                <div class="flex justify-between items-center mb-4">
-                    <h2 class="text-2xl font-bold text-[#06D6A0]">M2: 거절을 기회로 바꾸는 대처법</h2>
-                    <span class="font-bold text-gray-400">Page 2 / 3</span>
-                </div>
-                <div class="flex-grow flex flex-col justify-center">
-                    <h3 class="text-xl font-bold mb-4 text-center">✨ AI와 함께하는 거절 극복 훈련</h3>
-                    <p class="text-sm text-gray-600 mb-6 text-center">고객의 실제 거절 멘트를 입력하고, AI가 제안하는 다양한 대처법을 확인해 보세요.</p>
-                    <div class="max-w-xl mx-auto w-full">
-                        <textarea id="objection-input" class="w-full p-2 border border-gray-300 rounded-md" rows="3" placeholder="예: '지금은 바빠요', '가격이 너무 비싸네요'"></textarea>
-                        <button id="objection-handler-btn" class="gemini-button w-full mt-2">✨ 대처법 생성하기</button>
+        <section class="slide">
+            <div class="slide-content">
+                <h2 class="text-3xl md:text-4xl font-bold text-primary-dark mb-6">[WHAT] 분석 2: 분배적 공정성</h2>
+                <div class="bg-white p-8 rounded-lg shadow-xl text-left text-lg space-y-4">
+                    <h3 class="text-2xl font-bold text-primary-dark mb-4 text-center">신뢰성(Reliability) 저하 문제</h3>
+                    <div class="flex flex-col md:flex-row justify-around space-y-4 md:space-y-0 md:space-x-4">
+                        <div class="md:w-1/2 p-4 rounded-lg bg-green-100 border border-green-300 text-center">
+                            <h4 class="text-xl font-bold text-green-800 my-2">잠재력: 형평성</h4>
+                            <p class="text-sm text-green-700">지원자 역량 중심 평가 (Adams, 1965).<br>이상적으로는 '신뢰할 수 있는' 결과 도출.</p>
+                        </div>
+                        <div class="md:w-1/2 p-4 rounded-lg bg-red-100 border border-red-300 text-center">
+                            <h4 class="text-xl font-bold text-red-800 my-2">위험: 간접차별</h4>
+                            <p class="text-sm text-red-700">절차적 편향(적합성 문제)이 불공정한 결과(신뢰성 저하)를 초래함 (어승수 외, 2022).</p>
+                        </div>
                     </div>
                 </div>
             </div>
+        </section>
 
-            <div class="slide">
-                <div class="flex justify-between items-center mb-4">
-                    <h2 class="text-2xl font-bold text-[#FF6B6B]">M3: AI를 활용한 고객 관리</h2>
-                     <span class="font-bold text-gray-400">Page 3 / 3</span>
+        <section class="slide">
+            <div class="slide-content">
+                <h2 class="text-3xl md:text-4xl font-bold text-primary-dark mb-6">[WHAT] 분석 3: 대인관계 공정성</h2>
+                <div class="bg-white p-8 rounded-lg shadow-xl text-left text-lg space-y-4">
+                    <h3 class="text-2xl font-bold text-primary-dark mb-4 text-center">인지된 품질(Perceived Quality) 저하</h3>
+                    <ul class="list-none space-y-3">
+                        <li class="flex items-center text-red-600 font-semibold">
+                            <span class="text-3xl mr-3 font-bold">1.</span> <b>핵심 문제:</b> 양방향 소통 불가능 (Gilliland, 1993; 문혜진 & 남상희, 2022).
+                        </li>
+                        <li class="flex items-center text-red-600 font-semibold">
+                            <span class="text-3xl mr-3 font-bold">2.</span> <b>지원자 경험:</b> '비인간적' 느낌, '대우의 질' 훼손 (Blader & Tyler, 2003).
+                        </li>
+                        <li class="flex items-center text-red-600 font-semibold">
+                            <span class="text-3xl mr-3 font-bold">3.</span> <b>품질 저하:</b> 낮은 '사회적 현존감'이 지원자의 '인지된 품질'을 급격히 저하시킴 (Langer et al., 2019).
+                        </li>
+                    </ul>
                 </div>
-                <div class="flex-grow flex flex-col justify-center">
-                    <h3 class="text-xl font-bold mb-4 text-center">✨ AI 후속 메시지 초안 작성 도우미</h3>
-                    <p class="text-sm text-gray-600 mb-6 text-center">미팅의 핵심 내용을 간략히 입력하면 AI가 고객에게 보낼 후속 메시지 초안을 작성해 줍니다.</p>
-                    <div class="max-w-xl mx-auto w-full">
-                        <textarea id="meeting-notes-input" class="w-full p-2 border border-gray-300 rounded-md" rows="4" placeholder="미팅 날짜, 논의된 고객의 문제점, 제안한 해결책, 다음 단계 등을 입력하세요."></textarea>
-                        <button id="followup-generator-btn" class="gemini-button w-full mt-2">✨ 후속 메시지 초안 작성</button>
+            </div>
+        </section>
+        
+        <section class="slide">
+            <div class="slide-content">
+                <h2 class="text-3xl md:text-4xl font-bold text-primary-dark mb-6">[WHAT] 분석 4: 정보적 공정성</h2>
+                <div class="bg-white p-8 rounded-lg shadow-xl text-lg space-y-4">
+                    <h3 class="text-2xl font-bold text-primary-dark mb-4 text-center">신뢰성(Reliability) & 인지된 품질(Perceived Quality) 문제</h3>
+                    <div class="flex flex-col md:flex-row items-center justify-around">
+                        <div class="relative mb-4 md:mb-0">
+                            <div class="black-box">AI</div>
+                            <span class="black-box-q" style="top: -10px; left: -10px;">?</span>
+                            <span class="black-box-q" style="top: 50%; left: -30px;">?</span>
+                            <span class="black-box-q" style="bottom: -10px; left: 10px;">?</span>
+                            <span class="black-box-q" style="top: -15px; right: -10px;">?</span>
+                            <span class="black-box-q" style="top: 40%; right: -35px;">?</span>
+                            <span class="black-box-q" style="bottom: -15px; right: 0px;">?</span>
+                        </div>
+                        <ul class="list-none space-y-3 text-left md:w-1/2">
+                            <li class="text-red-600 font-semibold flex items-start"><span class="text-3xl mr-3 font-bold">▪️</span> <b>핵심 문제:</b> '블랙박스' 특성 (문혜진 & 남상희, 2022).</li>
+                            <li class="flex items-start"><span class="text-3xl mr-3 font-bold">▪️</span> <b>신뢰성 저하:</b> '설명' 부재로 시스템의 '신뢰성'을 입증할 수 없음 (Truxillo et al., 2009).</li>
+                            <li class="text-red-600 font-semibold flex items-start"><span class="text-3xl mr-3 font-bold">▪️</span> <b>인지된 품질 저하:</b> 불투명성이 지원자의 '인지된 품질'과 신뢰를 저해함 (심동녘 & 인혁준, 2023).</li>
+                        </ul>
                     </div>
                 </div>
             </div>
-        </div>
-    </main>
+        </section>
 
-    <div id="gemini-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50 flex items-center justify-center">
-        <div class="relative mx-auto p-5 border w-full max-w-2xl shadow-lg rounded-md bg-white">
-            <div class="mt-3">
-                <div class="flex justify-between items-center mb-4">
-                    <h3 id="modal-title" class="text-lg leading-6 font-bold text-gray-900">AI 생성 결과</h3>
-                    <button id="close-modal-button" class="text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
-                </div>
-                <div id="modal-content" class="mt-2 px-2 py-3 max-h-96 overflow-y-auto">
-                    <div id="modal-loader" class="flex justify-center items-center py-10">
-                        <div class="spinner"></div>
-                        <p class="ml-4">생성 중입니다. 잠시만 기다려주세요...</p>
-                    </div>
-                    <p id="modal-text" class="text-sm text-gray-700 text-left whitespace-pre-wrap"></p>
-                </div>
-                <div class="flex justify-end items-center px-4 py-3 border-t">
-                    <span id="copy-success" class="text-sm text-green-600 mr-4 hidden">복사 완료!</span>
-                    <button id="regenerate-button" class="gemini-button mr-2">✨ 다시 생성</button>
-                    <button id="copy-button" class="bg-gray-200 text-gray-800 font-bold py-2 px-4 rounded hover:bg-gray-300 mr-2">복사하기</button>
+        <section class="slide">
+            <div class="slide-content">
+                <h2 class="text-3xl md:text-4xl font-bold text-primary-dark mb-8">[WHAT'S NEXT] 결론: 핵심 발견</h2>
+                <div class="bg-white p-8 rounded-lg shadow-xl border-l-8 border-red-500 text-left">
+                    <h3 class="text-2xl font-bold text-gray-800 mb-4">총체적 품질 문제: '인지된 품질' 저하</h3>
+                    <ul class="list-none space-y-3 text-lg">
+                        <li class="flex items-start"><span class="text-2xl mr-3 font-bold">1.</span>AI 면접은 '절차적 일관성'을 제외한 Garvin의 핵심 품질 차원(적합성, 신뢰성, 서비스성)에서 문제를 노출함.</li>
+                        <li class="flex items-start text-red-600 font-semibold"><span class="text-2xl mr-3 font-bold">2.</span>특히 '대인관계/정보적 공정성' 문제는 지원자의 '인지된 품질(Perceived Quality)'을 크게 저하시킴.</li>
+                        <li class="flex items-start"><span class="text-2xl mr-3 font-bold">3.</span>기술적 효율성에만 집중한 결과, 사용자인 지원자의 신뢰(Trust)를 얻는 데 한계가 있음 (심동녘 & 인혁준, 2023).</li>
+                    </ul>
                 </div>
             </div>
-        </div>
+        </section>
+
+        <section class="slide">
+            <div class="slide-content">
+                <h2 class="text-3xl md:text-4xl font-bold text-primary-dark mb-8">[WHAT'S NEXT] 향후 연구 제언</h2>
+                <div class="bg-white p-8 rounded-lg shadow-xl w-full text-left">
+                    <h3 class="text-2xl font-bold text-gray-800 mb-6 text-center">통합적 품질 개선 모델 제안</h3>
+                    <div class="space-y-6">
+                        
+                        <div class="flex flex-col md:flex-row items-center md:space-x-4 space-y-4 md:space-y-0">
+                            <div class="w-full md:w-2/5 text-center p-4 rounded-lg shadow bg-red-100 text-red-800 border border-red-300">
+                                <h4 class="font-bold">문제: 블랙박스</h4>
+                                <p class="text-sm">(신뢰성 / 인지된 품질 ⬇)</p>
+                            </div>
+                            <div class="text-3xl font-bold text-primary-dark transform rotate-90 md:rotate-0">➡️</div>
+                            <div class="w-full md:w-3/5 text-center p-4 rounded-lg shadow bg-green-100 text-green-800 border border-green-300">
+                                <h4 class="font-bold">해결: 설명가능 AI (XAI) 도입</h4>
+                                <p class="text-sm">평가 과정의 투명성 및 신뢰 확보 방안 연구</p>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-col md:flex-row items-center md:space-x-4 space-y-4 md:space-y-0">
+                            <div class="w-full md:w-2/5 text-center p-4 rounded-lg shadow bg-blue-100 text-blue-800 border border-blue-300">
+                                <h4 class="font-bold">문제: 비인간화 / 수정 부재</h4>
+                                <p class="text-sm">(인지된 품질 / 서비스성 ⬇)</p>
+                            </div>
+                            <div class="text-3xl font-bold text-primary-dark transform rotate-90 md:rotate-0">➡️</div>
+                            <div class="w-full md-w-3/5 text-center p-4 rounded-lg shadow bg-green-100 text-green-800 border border-green-300">
+                                <h4 class="font-bold">해결: Human-in-the-loop (HITL)</h4>
+                                <p class="text-sm">인간의 감독 및 이의제기 절차를 통한 공정성 보완 연구</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="slide">
+            <div class="slide-content">
+                <h2 class="text-3xl md:text-4xl font-bold text-primary-dark mb-6">참고문헌</h2>
+                <div class="bg-white p-6 rounded-lg shadow-xl text-left text-xs overflow-y-auto h-[70vh]">
+                    <ul class="space-y-2">
+                        <li>문혜진, & 남상희. (2022). 인공지능을 활용한 비동시적 면접 연구의 현황과 과제. 한국심리학회지: 산업 및 조직, 35(3), 385–413.</li>
+                        <li>심동녘, & 인혁준. (2023). AI 채용 시스템의 공정성, 신뢰성, 혁신특성이 이용자의 태도에 미치는 영향. 상품학연구, 41(5), 49–58.</li>
+                        <li>어승수, 이중학, & 김영상. (2022). 간접차별의 국내 채용 맥락에서의 검증. 조직과 인사관리연구, 46(1), 83-108.</li>
+                        <li>Adams, J. S. (1965). Inequity in social exchange. In L. Berkowitz (Ed.), Advances in experimental social psychology (Vol. 2, pp. 267–299). Academic Press.</li>
+                        <li>Bauer, T. N., Truxillo, D. M., Sanchez, R. J., Craig, J. M., Ferrara, P., & Campion, M. A. (2001). Applicant reactions to selection: Development of the Selection Procedural Justice Scale (SPJS). Personnel Psychology, 54, 387-419.</li>
+                        <li>Bies, R. J., & Moag, J. S. (1986). Interactional justice: Communication criteria of fairness. In R. J. Lewicki, B. H. Sheppard, & M. H. Bazerman (Eds.), Research on negotiations in organizations (Vol. 1, pp. 43–55). JAI Press.</li>
+                        <li>Blader, S. L., & Tyler, T. R. (2003). A four-component model of procedural justice: Defining the meaning of a “fair” process. Personality and Social Psychology Bulletin, 29(6), 747–758.</li>
+                        <li>Colquitt, J. A., Conlon, D. E., Wesson, M. J., Porter, C. O. L. H., & Ng, K. Y. (2001). Justice at the millennium: A meta-analytic review of 25 years of organizational justice research. Journal of Applied Psychology, 86(3), 425–445.</li>
+                        <li>Garvin, D. A. (1987). Competing on the eight dimensions of quality. Harvard Business Review, 65(6), 101–109.</li>
+                        <li>Gilliland, S. W. (1993). The perceived fairness of selection systems: An organizational justice perspective. Academy of Management Review, 18(4), 694–734.</li>
+                        <li>Highhouse, S., Lievens, F., & Sinar, E. F. (2003). Measuring attraction to organizations. Educational and Psychological Measurement, 63(6), 986–1001.</li>
+                        <li>Jian, J. Y., Bisantz, A. M., & Drury C. G. (2000). Foundations for an empirically determined scale of trust in automated systems. International Journal of Cognitive Ergonomics, 4(1), 53–71.</li>
+                        <li>Langer, M., König, C. J., & Papathanasiou, M. (2019). Highly automated job interviews: Acceptance under the influence of stakes. International Journal of Selection and Assessment, 27(3), 217–234.</li>
+                        <li>Leventhal, G. S. (1980). What should be done with equity theory? New approaches to the study of fairness in social relationships. In K. J. Gergen, M. S. Greenberg, & R. H. Willis (Eds.), Social exchange: Advances in theory and research (pp. 27-55). Plenum.</li>
+                        <li>Mayer, R. C., Davis, J. H., & Schoorman, F. D. (1995). An integrative model of organizational trust. Academy of Management Review, 20(3), 709–734.</li>
+                        <li>Robert, L. P., Pierce, C., Marquis, L., Kim, S., & Alahmad, R. (2020). Designing fair AI for managing employees in organizations: A review, critique, and design agenda. Human-Computer Interaction, 35(5-6), 545-575.</li>
+                        <li>Truxillo, D. M., Bodner, T. E., Bertolino, M., Bauer, T. N., & Yonce, C. A. (2009). Effects of explanations on applicant reactions: A meta-analytic review. International Journal of Selection and Assessment, 17(4), 346-361.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
     </div>
-    
-    <footer class="bg-[#073B4C] text-white text-center py-6 px-4">
-        <p>&copy; 2025 Sales Growth Program. All Rights Reserved.</p>
-    </footer>
+
+    <button id="prevBtn" class="nav-btn">‹</button>
+    <button id="nextBtn" class="nav-btn">›</button>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // SLIDESHOW LOGIC
+        document.addEventListener('DOMContentLoaded', () => {
             const slides = document.querySelectorAll('.slide');
-            const prevBtn = document.getElementById('prev-btn');
-            const nextBtn = document.getElementById('next-btn');
             let currentSlide = 0;
 
-            function showSlide(index) {
-                slides.forEach((slide, i) => {
-                    if (i === index) {
-                        slide.classList.remove('hidden');
-                    } else {
-                        slide.classList.add('hidden');
-                    }
+            const showSlide = (index) => {
+                slides.forEach((slide) => {
+                    slide.classList.remove('active');
                 });
-            }
+                slides[index].classList.add('active');
+            };
 
-            function nextSlide() {
+            document.getElementById('nextBtn').addEventListener('click', () => {
                 currentSlide = (currentSlide + 1) % slides.length;
                 showSlide(currentSlide);
-            }
+            });
 
-            function prevSlide() {
+            document.getElementById('prevBtn').addEventListener('click', () => {
                 currentSlide = (currentSlide - 1 + slides.length) % slides.length;
                 showSlide(currentSlide);
-            }
-
-            prevBtn.addEventListener('click', prevSlide);
-            nextBtn.addEventListener('click', nextSlide);
-            
-            showSlide(currentSlide);
-
-            // MODAL AND GEMINI API LOGIC
-            const modal = document.getElementById('gemini-modal');
-            const modalTitle = document.getElementById('modal-title');
-            const modalLoader = document.getElementById('modal-loader');
-            const modalText = document.getElementById('modal-text');
-            const closeModalButton = document.getElementById('close-modal-button');
-            const regenerateButton = document.getElementById('regenerate-button');
-            const copyButton = document.getElementById('copy-button');
-            const copySuccessMessage = document.getElementById('copy-success');
-
-            let lastPrompt = '';
-
-            const openModal = () => modal.classList.remove('hidden');
-            const closeModal = () => modal.classList.add('hidden');
-
-            closeModalButton.addEventListener('click', closeModal);
-            modal.addEventListener('click', (e) => {
-                if (e.target === modal) closeModal();
             });
 
-            async function callGeminiAPI(prompt, retries = 3, delay = 1000) {
-                const apiKey = ""; 
-                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
-                const payload = { contents: [{ parts: [{ text: prompt }] }] };
-
-                try {
-                    const response = await fetch(apiUrl, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(payload)
-                    });
-
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-
-                    const result = await response.json();
-                    return result.candidates?.[0]?.content?.parts?.[0]?.text || "결과를 생성할 수 없습니다. 다시 시도해 주세요.";
-                } catch (error) {
-                    if (retries > 0) {
-                        await new Promise(res => setTimeout(res, delay));
-                        return callGeminiAPI(prompt, retries - 1, delay * 2);
-                    } else {
-                        return "오류가 발생했습니다. 잠시 후 다시 시도해 주세요.";
-                    }
-                }
-            }
-
-            async function generateContent(prompt, title) {
-                lastPrompt = prompt;
-                modalTitle.textContent = title;
-                modalText.textContent = '';
-                modalLoader.style.display = 'flex';
-                copySuccessMessage.classList.add('hidden');
-                openModal();
-                
-                const result = await callGeminiAPI(prompt);
-                
-                modalLoader.style.display = 'none';
-                modalText.textContent = result.trim();
-            }
-            
-            regenerateButton.addEventListener('click', () => {
-                if(lastPrompt) {
-                    generateContent(lastPrompt, modalTitle.textContent);
-                }
-            });
-
-            copyButton.addEventListener('click', () => {
-                const textToCopy = modalText.textContent;
-                const textArea = document.createElement('textarea');
-                textArea.value = textToCopy;
-                document.body.appendChild(textArea);
-                textArea.select();
-                try {
-                    document.execCommand('copy');
-                    copySuccessMessage.classList.remove('hidden');
-                    setTimeout(() => copySuccessMessage.classList.add('hidden'), 2000);
-                } catch (err) {
-                    console.error('Failed to copy text: ', err);
-                }
-                document.body.removeChild(textArea);
-            });
-
-            document.querySelectorAll('.script-generator-btn').forEach(button => {
-                button.addEventListener('click', () => {
-                    const type = button.dataset.type;
-                    const desc = button.dataset.desc;
-                    const prompt = `당신은 최고의 세일즈 코치입니다. '${type}' 고객에게 사용할 짧고 효과적인 첫 만남 스크립트를 한국어로 작성해 주세요. 이 고객의 특징은 다음과 같습니다: "${desc}". 스크립트는 친근하고 전문적이어야 하며, 빠르게 신뢰를 형성하는 것을 목표로 해야 합니다.`;
-                    generateContent(prompt, `'${type}' 고객 맞춤 스크립트`);
-                });
-            });
-
-            document.getElementById('objection-handler-btn')?.addEventListener('click', () => {
-                const objectionInput = document.getElementById('objection-input');
-                const objection = objectionInput.value.trim();
-                if (!objection) {
-                    alert('고객의 거절 멘트를 입력해 주세요.');
-                    return;
-                }
-                const prompt = `당신은 세계적인 세일즈 멘토입니다. 고객이 방금 "${objection}"이라는 거절을 했습니다. 이 상황에 영업사원이 대응할 수 있는 3가지 독창적이고 실행 가능한 전략을 한국어로 제안해 주세요. 각 전략은 간결하게 설명되어야 하고, 전문적인 어조를 유지해야 합니다. 번호 목록 형식으로 답변해 주세요.`;
-                generateContent(prompt, `"${objection}"에 대한 대처법`);
-            });
-            
-            document.getElementById('followup-generator-btn')?.addEventListener('click', () => {
-                const notesInput = document.getElementById('meeting-notes-input');
-                const notes = notesInput.value.trim();
-                 if (!notes) {
-                    alert('미팅 핵심 내용을 입력해 주세요.');
-                    return;
-                }
-                const prompt = `당신은 전문적인 세일즈 어시스턴트입니다. 다음 미팅 노트를 기반으로 간결하고 정중한 후속 메시지(이메일 또는 문자) 초안을 한국어로 작성해 주세요. 메시지는 고객에게 감사 인사를 전하고, 핵심 내용을 요약하며, 다음 단계를 명확하게 제시해야 합니다.\n\n미팅 노트:\n"${notes}"`;
-                generateContent(prompt, "후속 메시지 초안");
-            });
-
+            showSlide(0);
         });
-    </script>
+    </SCRIpt>
 </body>
 </html>
 
